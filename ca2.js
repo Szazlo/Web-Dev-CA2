@@ -17,8 +17,6 @@ let player = {
     yChange : 0,
 }
 
-
-
 let enemies = [];
 
 let floor;
@@ -27,6 +25,9 @@ let moveLeft = false;
 let moveRight = false;
 let moveUp = false;
 let moveDown = false;
+let objX = [10,20,30,40];
+let objY = [10,20,30,40];
+let objLen = objX.length;
 
 let IMAGES = {player: "character.png"};
 
@@ -78,6 +79,12 @@ function draw() {
         };
         enemies.push(a);
     }
+
+    //obj spawning (fix respawning)
+    context.fillStyle = 'pink';
+        let objSpawn = randint(0, objLen);
+        context.fillRect(objX[objSpawn], objY[objSpawn], 32, 32);
+
 
     //enemies and enemy movement
     context.fillStyle = 'yellow';
@@ -131,6 +138,10 @@ function draw() {
 //collisions
 for (let a of enemies){
     if (player_collides(a)){
+        player.frameX = 64; player.frameY = 111;
+        context.drawImage(IMAGES.player,
+            player.frameX, player.frameY, player.width, player.height,
+            player.x, player.y, player.width, player.height);
         stop();
         return;
     }
@@ -162,13 +173,6 @@ if (player.x > canvas.width) {
     player.xChange = 0;
 }
 
-    // Going off left or right
-    // if (player.x + player.width < 0) {
-    //     player.x = canvas.width;
-    //   } else if (player.x > canvas.width) {
-    //     player.x = - player.width;
-    //   }
-    
     //physics
     player.yChange = player.yChange * 0.6;
     player.xChange = player.xChange * 0.6;
@@ -227,10 +231,11 @@ function stop() {
 }
 
 //randomized spawn locations for flags
-function chooseformlist(list) {
-    let index = Math.floor(Math.random()*list.length);
-    return list[index];
-  }
+// function choose_from_list(list) {
+//     let index = Math.floor(Math.random()*list.length);
+//     return list[index];
+//   }
+//replace with randint method
 
 function load_images(callback) {
     let num_images = Object.keys(IMAGES).length;
