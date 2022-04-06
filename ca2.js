@@ -25,11 +25,16 @@ let moveLeft = false;
 let moveRight = false;
 let moveUp = false;
 let moveDown = false;
-let objX = [10,20,30,40];
-let objY = [10,20,30,40];
+let enemySpeed = 2.5;
+let objX = [110,85,320,480,765,880];
+let objY = [65,350,120,350,370,100];
 let objLen = objX.length;
+let objSpawn = randint(0, objLen);
+let objSize = 16;
+let objVal = 15;
+let playerCredits = 0;
 
-let IMAGES = {player: "character.png"};
+let IMAGES = {player: "character.png", map: "map.JPG"};
 
 document.addEventListener('DOMContentLoaded', init, false);
 
@@ -39,7 +44,7 @@ function init() {
 //set floor
     floor = canvas.height - 27;
     player.x = canvas.width / 2;
-    player.y = floor - player.height;
+    player.y = canvas.height - player.height;
 //movement
     window.addEventListener('keydown', activate, false);
     window.addEventListener('keyup', deactivate, false);
@@ -56,10 +61,7 @@ function draw() {
     then = now - (elapsed % fpsInterval);
     //canvas environment design
     context.clearRect(0,0, canvas.width, canvas.height);
-    context.fillStyle = '#87cefa';
-    context.fillRect(0,0, canvas.width, canvas.height);
-    context.fillStyle = '#7CFC00';
-    context.fillRect(0, floor-10, canvas.width, canvas.height);
+    context.drawImage(IMAGES.map,0,0); 
     //player
     context.drawImage(IMAGES.player,
         player.frameX, player.frameY, player.width, player.height,
@@ -80,11 +82,12 @@ function draw() {
         enemies.push(a);
     }
 
-    //obj spawning (fix respawning)
-    context.fillStyle = 'pink';
-        let objSpawn = randint(0, objLen);
-        context.fillRect(objX[objSpawn], objY[objSpawn], 32, 32);
-
+    //innit obj spawning
+    context.fillStyle = 'lightgreen';
+    context.fillRect(objX[objSpawn], objY[objSpawn], objSize, objSize);
+    context.fillStyle = 'gold';
+    context.font = "30px Arial";
+    context.fillText(playerCredits,10,50);
 
     //enemies and enemy movement
     context.fillStyle = 'yellow';
@@ -99,16 +102,16 @@ function draw() {
          //follow player
         else{
         if (a.x < player.x){
-        a.x = a.x + player.xChange+2.5;
+        a.x = a.x + player.xChange+enemySpeed;
         }
         else{
-        a.x = a.x + player.xChange-2.5;
+        a.x = a.x + player.xChange-enemySpeed;
         }
         if (a.y < player.y){
-            a.y = a.y + player.yChange+2.5;
+            a.y = a.y + player.yChange+enemySpeed;
         }
         else{
-            a.y = a.y + player.yChange-2.5;
+            a.y = a.y + player.yChange-enemySpeed;
         }
         // a.y = a.y + player.yChange+1;
         }
@@ -147,27 +150,33 @@ for (let a of enemies){
     }
 }
 
+if (obj_reached()){
+    objSpawn = randint(0, objLen);
+    playerCredits = playerCredits + objVal;
+    enemySpeed = enemySpeed*1.1;
+}
+
   // Update the player
   player.x = player.x + player.xChange;
   player.y = player.y + player.yChange;
 
 // on floor
-if (player.y + player.height > floor) {
+if (player.y + player.height > canvas.height) {
     player.in_air = false;
-    player.y = floor - player.height;
+    player.y = canvas.height - player.height;
     player.yChange = 0;
 }
-if (player.y + player.height < 0) {
+if (player.y < 0) {
     player.in_air = false;
-    player.y = 0 + player.height;
+    player.y = 0;
     player.yChange = 0;
 }
-if (player.x + player.width < 0) {
+if (player.x < 0) {
     player.in_air = false;
-    player.x = 0 + player.width;
+    player.x = 0;
     player.xChange = 0;
 }
-if (player.x > canvas.width) {
+if (player.x + player.width > canvas.width) {
     player.in_air = false;
     player.x = canvas.width - player.width;
     player.xChange = 0;
@@ -211,6 +220,17 @@ function deactivate(event) {
      } else if (key === "ArrowDown") {
         moveDown = false;
 }
+}
+
+function obj_reached() {
+    if (player.x + player.width < objX[objSpawn] ||
+        objX[objSpawn] + objSize < player.x ||
+        player.y > objY[objSpawn] + objSize ||
+        objY[objSpawn] > player.y + player.height) {
+        return false;
+     } else {
+        return true;
+    }
 }
 
 function player_collides (a) {
