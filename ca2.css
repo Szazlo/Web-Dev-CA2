@@ -6,3 +6,19 @@ canvas{
 h1{
     text-align: center;
 }
+footer {
+    position:absolute;
+    bottom:0;
+    width:100%;
+ }
+image{
+    display: inline-block;
+}
+
+.spoiler{
+    color: black; background: black;
+}
+
+.spoiler:hover{
+    color: black; background: lightgray;
+}
